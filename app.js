@@ -424,24 +424,25 @@ function applyFilters() {
                         <span class="popup-label">Código Actividad:</span>
                         <span class="popup-value">${props.codi_actividad}</span>
                     </div>
+
+                    <div class="popup-row vertical">
+                        <span class="popup-label">Referencia Catastral:</span>
+                        <span class="popup-value highlight-value">${props.id_uni_cat}</span>
+                    </div>
                     <div class="popup-row">
                         <span class="popup-label">Piso:</span>
                         <span class="popup-value">${props.codi_piso}</span>
-                    </div>
-                    <div class="popup-row">
-                        <span class="popup-label">Lote:</span>
-                        <span class="popup-value">${props.codi_lote}</span>
                     </div>
                     <div class="popup-row">
                         <span class="popup-label">Área Gráfica:</span>
                         <span class="popup-value">${props.area_grafica} m²</span>
                     </div>
                     <div class="popup-row">
-                        <span class="popup-label">Ficha:</span>
+                        <span class="popup-label">Ficha Económica:</span>
                         <span class="popup-value">${props.nume_ficha}</span>
                     </div>
                     <div class="popup-row">
-                        <span class="popup-label">Fecha:</span>
+                        <span class="popup-label">Fecha de Levantamiento:</span>
                         <span class="popup-value">${props.fecha_levantamiento}</span>
                     </div>
                 </div>
@@ -669,3 +670,4 @@ function updateLabelsVisibility() {
         }
     });
 }
+
