@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catastro Wanchaq 2025</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="header-title">
+                <i class="fas fa-map-marked-alt"></i>
+                Catastro Wanchaq 2025 - Actividad Económica
+            </h1>
+            <div class="header-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Total Comercios</span>
+                    <span class="stat-value" id="totalComercios">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Filtrados</span>
+                    <span class="stat-value" id="filteredComercios">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar Dashboard -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-chart-bar"></i> Dashboard - Comercios</h2>
+                <button class="btn-toggle" id="toggleSidebar">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+
+            <div class="sidebar-content">
+                <!-- Filters Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-filter"></i> Filtros</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="filter-group">
+                            <label for="activityFilter">Actividad Económica</label>
+                            <select id="activityFilter" class="form-select">
+                                <option value="">Todas las actividades</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="pisoFilter">Piso</label>
+                            <select id="pisoFilter" class="form-select">
+                                <option value="">Todos los pisos</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn-primary" id="applyFilters">
+                            <i class="fas fa-check"></i> Aplicar Filtros
+                        </button>
+                        <button class="btn btn-secondary" id="clearFilters">
+                            <i class="fas fa-times"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-bar"></i> Top 10 Actividades</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="activityChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Layer Controls -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-layer-group"></i> Capas</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="layer-control">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="layerComercios" checked>
+                                <span>Comercios</span>
+                            </label>
+                        </div>
+                        <div class="layer-control">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="layerSectores" checked>
+                                <span>Sectores</span>
+                            </label>
+                        </div>
+                        <div class="layer-control">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="layerManzanas" checked>
+                                <span>Manzanas</span>
+                            </label>
+                        </div>
+                        <div class="layer-control">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="layerLotes" checked>
+                                <span>Lotes</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Sidebar Toggle Button (when collapsed) -->
+        <button class="sidebar-toggle-btn" id="showSidebar" style="display: none;">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Map Container -->
+        <main class="map-container">
+            <div id="map"></div>
+
+            <!-- Map Controls -->
+            <div class="map-controls">
+                <button class="map-btn" id="zoomIn" title="Acercar">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button class="map-btn" id="zoomOut" title="Alejar">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button class="map-btn" id="zoomHome" title="Vista inicial">
+                    <i class="fas fa-home"></i>
+                </button>
+                <button class="map-btn" id="measureBtn" title="Medir distancia">
+                    <i class="fas fa-ruler"></i>
+                </button>
+                <button class="map-btn" id="fullscreenBtn" title="Pantalla completa">
+                    <i class="fas fa-expand"></i>
+                </button>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend" id="legend">
+                <h4><i class="fas fa-info-circle"></i> Leyenda - Pisos</h4>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #FF0000;"></span>
+                    <span>Piso 01 - Rojo</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #FFFF00;"></span>
+                    <span>Piso 02 - Amarillo</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #00FF00;"></span>
+                    <span>Piso 03 - Verde</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #00FFFF;"></span>
+                    <span>Piso 04 - Cyan</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #0000FF;"></span>
+                    <span>Piso 05 - Azul</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #FFC0CB;"></span>
+                    <span>Piso 06 - Rosado</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #FFA500;"></span>
+                    <span>Piso 07 - Naranja</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #800080;"></span>
+                    <span>Piso 08 - Morado</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #8B00FF;"></span>
+                    <span>Piso 09 - Violeta</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #9370DB;"></span>
+                    <span>Piso 10 - Púrpura</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #4B0082;"></span>
+                    <span>Piso 11 - Violeta Azulado</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #C71585;"></span>
+                    <span>Piso 12 - Violeta Rojizo</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #8B4513;"></span>
+                    <span>Piso 71 - Marrón</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #90EE90;"></span>
+                    <span>Piso 81 - Verde Claro</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #98FB98;"></span>
+                    <span>Piso 82 - Verde Tenue</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #AFEEAF;"></span>
+                    <span>Piso 83 - Verde Más Tenue</span>
+                </div>
+                <hr style="border-color: rgba(255,255,255,0.2); margin: 10px 0;">
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #9b59b6; opacity: 0.3;"></span>
+                    <span>Sectores</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #3498db; opacity: 0.3;"></span>
+                    <span>Manzanas</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #2c3e50; opacity: 0.3;"></span>
+                    <span>Lotes</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>Cargando datos...</p>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Data Files -->
+    <script src="data/tg_sector.js"></script>
+    <script src="data/tg_manzana.js"></script>
+    <script src="data/tg_lote.js"></script>
+    <script src="data/tg_comercio.js"></script>
+
+    <!-- Main App -->
+    <script src="app.js"></script>
+</body>
+
+</html>
